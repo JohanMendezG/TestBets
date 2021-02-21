@@ -9,7 +9,8 @@ namespace BetPlay.Data.Roulettes
     {
         BetPlay.Entities.Roulettes GetRoulette(int id);
         List<BetPlay.Entities.Roulettes> GetRoulettes();
-        bool AddRoulette(BetPlay.Entities.Roulettes roulette);
-        bool EditRoulette(BetPlay.Entities.Roulettes roulette);
+        int CreateRoulette();
+        bool OpenRoulette(int id);
+        bool CloseRoulette(int id);
     }
 }

@@ -17,8 +17,61 @@ namespace BetPlay.Controllers
         {
             this.roulettes = roulettes;
         }
-        [HttpGet("{id}")]
-        public 
-
+        [HttpGet]
+        public ActionResult<List<Entities.Roulettes>> GetRoulettes()
+        {
+            try
+            {
+                return roulettes.GetRoulettes();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message.Contains("inner") ? ex.InnerException.Message : ex.Message);
+            }
+        }
+        [HttpPost]
+        public ActionResult<int> CreateRoulette()
+        {
+            try
+            {
+                return roulettes.CreateRoulette();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message.Contains("inner") ? ex.InnerException.Message : ex.Message);
+            }
+        }
+        [HttpPut("/OpenRoulette/{id}")]
+        public ActionResult<string> OpenRoulette(int id)
+        {
+            try
+            {
+                Entities.Roulettes roulette = roulettes.GetRoulette(id);
+                if (roulette.State == true)
+                    return $"Ruleta {id} apertura DENY";
+                roulettes.OpenRoulette(id);
+                return $"Ruleta {id} apertura OK";
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message.Contains("inner") ? ex.InnerException.Message : ex.Message);
+            }
+        }
+        [HttpPut("/CloseRoulette/{id}")]
+        public ActionResult<string> CloseRoulette(int id)
+        {
+            try
+            {
+                Entities.Roulettes roulette = roulettes.GetRoulette(id);
+                if (roulette.State == false)
+                    return $"Ruleta {id} cierre DENY";
+                roulettes.CloseRoulette(id);
+                return $"Ruleta {id} cierre OK";
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message.Contains("inner") ? ex.InnerException.Message : ex.Message);
+            }
+        }
     }
 }
