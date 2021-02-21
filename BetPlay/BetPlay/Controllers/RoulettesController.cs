@@ -29,7 +29,7 @@ namespace BetPlay.Controllers
                 return BadRequest(ex.Message.Contains("inner") ? ex.InnerException.Message : ex.Message);
             }
         }
-        [HttpPost]
+        [HttpPost("/CreateRoulette")]
         public ActionResult<int> CreateRoulette()
         {
             try

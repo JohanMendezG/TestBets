@@ -1,3 +1,4 @@
+using BetPlay.Data.Bets;
 using BetPlay.Data.Roulettes;
 using BetPlay.Data.Users;
 using Microsoft.AspNetCore.Builder;
@@ -22,6 +23,7 @@ namespace BetPlay
         {
             services.AddScoped<IUsers, MockUsers>();
             services.AddScoped<IRoulettes, MockRoulettes>();
+            services.AddScoped<IBets, MockBets>();
             services.AddControllers();
             services.AddSwaggerGen();
         }
