@@ -13,27 +13,11 @@ namespace BetPlay.Data.Roulettes
         {
             this.configuration = configuration;
         }
-        public bool AddRoulette(Entities.Roulettes roulette)
-        {
-            using (SqlConnection connection = new SqlConnection(configuration.GetConnectionString("ConnectionString")))
-            {
-                try
-                {
-                    var query = $"INSERT INTO [BetPlay].[dbo].[Roulettes]([Name], [State]) VALUES('{roulette.Name}',{(roulette.State ? 1 : 0)})";
-                    SqlCommand command = new SqlCommand(query, connection);
-                }
-                catch (Exception ex)
-                {
-                    throw ex;
-                }
-                return true;
-            }
-        }
         public Entities.Roulettes GetRoulette(int id)
         {
             using (SqlConnection connection = new SqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                var query = $"SELECT	Id, Name, State FROM [BetPlay].[dbo].[Roulettes] WHERE Id = {id}";
+                var query = $"SELECT Id, State FROM [BetPlay].[dbo].[Roulettes] WHERE Id = {id}";
                 SqlCommand command = new SqlCommand(query, connection);
                 try
                 {
@@ -54,7 +38,7 @@ namespace BetPlay.Data.Roulettes
         {
             using (SqlConnection connection = new SqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                var query = "SELECT	Id, Name, State FROM [BetPlay].[dbo].[Roulettes]";
+                var query = "SELECT	Id, State FROM [BetPlay].[dbo].[Roulettes]";
                 SqlCommand command = new SqlCommand(query, connection);
                 try
                 {
@@ -71,13 +55,51 @@ namespace BetPlay.Data.Roulettes
                 }
             }
         }
-        public bool EditRoulette(Entities.Roulettes roulette)
+        public int CreateRoulette()
+        {
+            using (SqlConnection connection = new SqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                var query = $"INSERT INTO [BetPlay].[dbo].[Roulettes]([State]) VALUES(0);" +
+                           $"SELECT Id = CAST(SCOPE_IDENTITY() AS INT), CAST(0 AS bit)";
+                SqlCommand command = new SqlCommand(query, connection);
+                try
+                {
+                    connection.Open();
+                    SqlDataReader reader = command.ExecuteReader();
+                    Entities.Roulettes response = ReadRoulettes(reader).FirstOrDefault();
+                    reader.Close();
+                    connection.Close();
+                    return response.Id;
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+        }
+        public bool OpenRoulette(int id)
         {
             using (SqlConnection connection = new SqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
                 try
                 {
-                    var query = $"UPDATE [BetPlay].[dbo].[Roulettes] SET [Name]='{roulette.Name}', [State]={(roulette.State ? 1 : 0)} WHERE Id = {roulette.Id}";
+                    var query = $"UPDATE [BetPlay].[dbo].[Roulettes] SET [State]=1 WHERE Id = {id}";
+                    SqlCommand command = new SqlCommand(query, connection);
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                return true;
+            }
+        }
+        public bool CloseRoulette(int id)
+        {
+            using (SqlConnection connection = new SqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                try
+                {
+                    var query = $"UPDATE [BetPlay].[dbo].[Roulettes] SET [State]=0 WHERE Id = {id}";
                     SqlCommand command = new SqlCommand(query, connection);
                 }
                 catch (Exception ex)
@@ -94,9 +116,8 @@ namespace BetPlay.Data.Roulettes
             {
                 roulettes.Add(new Entities.Roulettes
                 {
-                    Id = reader.GetInt32(0),
-                    Name = reader.GetString(1),
-                    State = reader.GetBoolean(2)
+                    Id = (int)reader[0],
+                    State = (bool)reader[1]
                 });
             }
             return roulettes;
