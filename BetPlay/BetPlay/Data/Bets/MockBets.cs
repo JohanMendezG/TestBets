@@ -21,7 +21,8 @@ namespace BetPlay.Data.Bets
                 try
                 {
                     connection.Open();
-                    var query = $"INSERT INTO [BetPlay].[dbo].[Bets](RouletteId,UserId,BetNumber,Number,Color,[Money]) VALUES({bet.RouletteId},{bet.UserId},'{bet.BetNumber}',{bet.Number},{bet.Color},{bet.Money})";
+                    var query = $"INSERT INTO [BetPlay].[dbo].[Bets](Fecha,RouletteId,UserId,BetNumber,Number,Color,[Money]) " +
+                        $"VALUES('{DateTime.UtcNow:O}',{bet.RouletteId},{bet.UserId},'{bet.BetNumber}',{bet.Number},{bet.Color},{bet.Money})";
                     SqlCommand command = new SqlCommand(query, connection);
                     command.ExecuteNonQuery();
                     connection.Close();
