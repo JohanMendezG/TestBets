@@ -21,7 +21,7 @@ namespace BetPlay.Data.Bets
                 try
                 {
                     connection.Open();
-                    var query = $"SELECT Id,Fecha,RouletteId,UserId,BetNumber,Number,Color,Money FROM [BetPlay].[dbo].[Bets] WHERE RouletteId = {RouletteId}";
+                    var query = $"SELECT Id,DateBet,RouletteId,UserId,BetNumber,Number,Color,Money FROM [BetPlay].[dbo].[Bets] WHERE RouletteId = {RouletteId}";
                     SqlCommand command = new SqlCommand(query, connection);
                     command.ExecuteNonQuery();
                     SqlDataReader reader = command.ExecuteReader();
@@ -43,7 +43,7 @@ namespace BetPlay.Data.Bets
                 try
                 {
                     connection.Open();
-                    var query = $"INSERT INTO [BetPlay].[dbo].[Bets](Fecha,RouletteId,UserId,BetNumber,Number,Color,[Money]) " +
+                    var query = $"INSERT INTO [BetPlay].[dbo].[Bets](DateBet,RouletteId,UserId,BetNumber,Number,Color,[Money]) " +
                         $"VALUES('{DateTime.UtcNow:O}',{bet.RouletteId},{bet.UserId},'{bet.BetNumber}',{bet.Number},{bet.Color},{bet.Money})";
                     SqlCommand command = new SqlCommand(query, connection);
                     command.ExecuteNonQuery();
@@ -100,7 +100,7 @@ namespace BetPlay.Data.Bets
                 bets.Add(new Entities.Bets
                 {
                     Id = (int)reader[0],
-                    Fecha = (string)reader[1],
+                    DateBet = (string)reader[1],
                     RouletteId = (int)reader[2],
                     UserId = (int)reader[3],
                     BetNumber =(bool)reader[4],

@@ -9,7 +9,7 @@ namespace BetPlay.Entities
     {
         public int Id { get; set; }
         public bool State { get; set; }
-        public string Apertura { get; set; }
-        public string Cierre { get; set; }
+        public string DateOpen { get; set; }
+        public string DateClose { get; set; }
     }
 }

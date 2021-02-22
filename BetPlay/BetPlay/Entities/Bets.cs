@@ -13,7 +13,7 @@ namespace BetPlay.Entities
         public int RouletteId { get; set; }
         [Required]
         public int UserId { get; set; }
-        public string Fecha { get; set; }
+        public string DateBet { get; set; }
         public int Number { get; set; }
         [RegularExpression("^[0-1]{1}$", ErrorMessage ="Debe elegir Rojo: 1, Negro: 0")]
         public int Color { get; set; }

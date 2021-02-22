@@ -22,7 +22,7 @@ namespace BetPlay.Data.Roulettes
                 try
                 {
                     connection.Open();
-                    var query = $"SELECT Id,State,Apertura,Cierre FROM [BetPlay].[dbo].[Roulettes] WHERE Id = {id}";
+                    var query = $"SELECT Id,State,DateOpen,DateClose FROM [BetPlay].[dbo].[Roulettes] WHERE Id = {id}";
                     SqlCommand command = new SqlCommand(query, connection);
                     command.ExecuteNonQuery();
                     SqlDataReader reader = command.ExecuteReader();
@@ -44,7 +44,7 @@ namespace BetPlay.Data.Roulettes
                 try
                 {
                     connection.Open();
-                    var query = "SELECT	Id,State,Apertura,Cierre FROM [BetPlay].[dbo].[Roulettes]";
+                    var query = "SELECT	Id,State,DateOpen,DateClose FROM [BetPlay].[dbo].[Roulettes]";
                     SqlCommand command = new SqlCommand(query, connection);
                     command.ExecuteNonQuery();
                     SqlDataReader reader = command.ExecuteReader();
@@ -66,8 +66,8 @@ namespace BetPlay.Data.Roulettes
                 try
                 {
                     connection.Open();
-                    var query = $"INSERT INTO [BetPlay].[dbo].[Roulettes]([State],Apertura,Cierre) VALUES(0,'',''); " +
-                           $"SELECT Id = CAST(SCOPE_IDENTITY() AS INT), [State] = CAST(0 AS bit), Apertura = '', Cierre = ''";
+                    var query = $"INSERT INTO [BetPlay].[dbo].[Roulettes]([State],DateOpen,DateClose) VALUES(0,'',''); " +
+                           $"SELECT Id = CAST(SCOPE_IDENTITY() AS INT), [State] = CAST(0 AS bit), DateOpen = '', DateClose = ''";
                     SqlCommand command = new SqlCommand(query, connection);
                     command.ExecuteNonQuery();
                     SqlDataReader reader = command.ExecuteReader();
@@ -89,7 +89,7 @@ namespace BetPlay.Data.Roulettes
                 try
                 {
                     connection.Open();
-                    var query = $"UPDATE [BetPlay].[dbo].[Roulettes] SET [State]=1, Apertura='{DateTime.UtcNow:O}', Cierre='' WHERE Id = {id}";
+                    var query = $"UPDATE [BetPlay].[dbo].[Roulettes] SET [State]=1, DateOpen='{DateTime.UtcNow:O}', DateClose='' WHERE Id = {id}";
                     SqlCommand command = new SqlCommand(query, connection);
                     command.ExecuteNonQuery();
                     connection.Close();
@@ -108,7 +108,7 @@ namespace BetPlay.Data.Roulettes
                 try
                 {
                     connection.Open();
-                    var query = $"UPDATE [BetPlay].[dbo].[Roulettes] SET [State]=0, Cierre='{DateTime.UtcNow:O}' WHERE Id = {id}";
+                    var query = $"UPDATE [BetPlay].[dbo].[Roulettes] SET [State]=0, DateClose='{DateTime.UtcNow:O}' WHERE Id = {id}";
                     SqlCommand command = new SqlCommand(query, connection);
                     command.ExecuteNonQuery();
                     connection.Close();
@@ -127,13 +127,13 @@ namespace BetPlay.Data.Roulettes
         }
         private List<Entities.Bets> FilterBets(Entities.Roulettes roulette)
         {
-            var apertura = DateTime.Parse(roulette.Apertura, null, System.Globalization.DateTimeStyles.RoundtripKind);
-            var cierre = DateTime.Parse(roulette.Cierre, null, System.Globalization.DateTimeStyles.RoundtripKind);
+            var apertura = DateTime.Parse(roulette.DateOpen, null, System.Globalization.DateTimeStyles.RoundtripKind);
+            var cierre = DateTime.Parse(roulette.DateClose, null, System.Globalization.DateTimeStyles.RoundtripKind);
             List<Entities.Bets> bets = GetBets(roulette.Id);
             List<Entities.Bets> filterBets = new List<Entities.Bets>();
             foreach (var bet in bets)
             {
-                var fecha = DateTime.Parse(bet.Fecha, null, System.Globalization.DateTimeStyles.RoundtripKind);
+                var fecha = DateTime.Parse(bet.DateBet, null, System.Globalization.DateTimeStyles.RoundtripKind);
                 if (fecha >= apertura && fecha <= cierre)
                     filterBets.Add(bet);
             }
@@ -153,8 +153,8 @@ namespace BetPlay.Data.Roulettes
                 {
                     Id = (int)reader[0],
                     State = (bool)reader[1],
-                    Apertura = (string)reader[2],
-                    Cierre = (string)reader[3]
+                    DateOpen = (string)reader[2],
+                    DateClose = (string)reader[3]
                 });
             }
             return roulettes;
