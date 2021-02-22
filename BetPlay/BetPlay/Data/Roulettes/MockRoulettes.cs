@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using BetPlay.Data.Bets;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -88,7 +89,7 @@ namespace BetPlay.Data.Roulettes
                 try
                 {
                     connection.Open();
-                    var query = $"UPDATE [BetPlay].[dbo].[Roulettes] SET [State]=1, Apertura='{DateTime.UtcNow:O}' WHERE Id = {id}";
+                    var query = $"UPDATE [BetPlay].[dbo].[Roulettes] SET [State]=1, Apertura='{DateTime.UtcNow:O}', Cierre='' WHERE Id = {id}";
                     SqlCommand command = new SqlCommand(query, connection);
                     command.ExecuteNonQuery();
                     connection.Close();
@@ -118,6 +119,30 @@ namespace BetPlay.Data.Roulettes
                     throw ex;
                 }
             }
+        }
+        public List<Entities.Bets> BetsResults(int roulettesId)
+        {
+            var roulette = GetRoulette(roulettesId);
+            return FilterBets(roulette);
+        }
+        private List<Entities.Bets> FilterBets(Entities.Roulettes roulette)
+        {
+            var apertura = DateTime.Parse(roulette.Apertura, null, System.Globalization.DateTimeStyles.RoundtripKind);
+            var cierre = DateTime.Parse(roulette.Cierre, null, System.Globalization.DateTimeStyles.RoundtripKind);
+            List<Entities.Bets> bets = GetBets(roulette.Id);
+            List<Entities.Bets> filterBets = new List<Entities.Bets>();
+            foreach (var bet in bets)
+            {
+                var fecha = DateTime.Parse(bet.Fecha, null, System.Globalization.DateTimeStyles.RoundtripKind);
+                if (fecha >= apertura && fecha <= cierre)
+                    filterBets.Add(bet);
+            }
+            return filterBets;
+        }
+        private List<Entities.Bets> GetBets(int roulettesId)
+        {
+            MockBets mockRoulettes = new MockBets(configuration);
+            return mockRoulettes.GetBets(roulettesId);
         }
         private List<Entities.Roulettes> ReadRows(SqlDataReader reader)
         {

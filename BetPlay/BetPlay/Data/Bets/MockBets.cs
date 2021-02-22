@@ -14,6 +14,28 @@ namespace BetPlay.Data.Bets
         {
             this.configuration = configuration;
         }
+        public List<Entities.Bets> GetBets(int RouletteId)
+        {
+            using (SqlConnection connection = new SqlConnection(configuration.GetConnectionString("ConnectionString")))
+            {
+                try
+                {
+                    connection.Open();
+                    var query = $"SELECT Id,Fecha,RouletteId,UserId,BetNumber,Number,Color,Money FROM [BetPlay].[dbo].[Bets] WHERE RouletteId = {RouletteId}";
+                    SqlCommand command = new SqlCommand(query, connection);
+                    command.ExecuteNonQuery();
+                    SqlDataReader reader = command.ExecuteReader();
+                    List<Entities.Bets> response = ReadRowsForBets(reader);
+                    reader.Close();
+                    connection.Close();
+                    return response;
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+        }
         public bool LoadBet(Entities.Bets bet)
         {
             using (SqlConnection connection = new SqlConnection(configuration.GetConnectionString("ConnectionString")))
@@ -69,6 +91,25 @@ namespace BetPlay.Data.Bets
                 money = (decimal)reader[0];
             }
             return money;
+        }
+        private List<Entities.Bets> ReadRowsForBets(SqlDataReader reader)
+        {
+            List<Entities.Bets> bets = new List<Entities.Bets>();
+            while (reader.Read())
+            {
+                bets.Add(new Entities.Bets
+                {
+                    Id = (int)reader[0],
+                    Fecha = (string)reader[1],
+                    RouletteId = (int)reader[2],
+                    UserId = (int)reader[3],
+                    BetNumber =(bool)reader[4],
+                    Number = (int)reader[5],
+                    Color = (int)reader[6],
+                    Money = (decimal)reader[7]
+                }) ;
+            }
+            return bets ;
         }
     }
 }

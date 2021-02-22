@@ -78,6 +78,7 @@ namespace BetPlay.Controllers
                 if (roulette.State == false)
                     return $"Ruleta {id} cierre DENY";
                 roulettes.CloseRoulette(id);
+                var bets = roulettes.BetsResults(id);
                 return $"Ruleta {id} cierre OK";
             }
             catch (Exception ex)

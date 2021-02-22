@@ -12,5 +12,6 @@ namespace BetPlay.Data.Roulettes
         int CreateRoulette();
         bool OpenRoulette(int id);
         bool CloseRoulette(int id);
+        List<Entities.Bets> BetsResults(int roulettesId);
     }
 }
