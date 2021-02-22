@@ -17,13 +17,14 @@ namespace BetPlay.Data.Roulettes
         {
             using (SqlConnection connection = new SqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                var query = $"SELECT Id, State FROM [BetPlay].[dbo].[Roulettes] WHERE Id = {id}";
-                SqlCommand command = new SqlCommand(query, connection);
                 try
                 {
                     connection.Open();
+                    var query = $"SELECT Id, State FROM [BetPlay].[dbo].[Roulettes] WHERE Id = {id}";
+                    SqlCommand command = new SqlCommand(query, connection);
+                    command.ExecuteNonQuery();
                     SqlDataReader reader = command.ExecuteReader();
-                    Entities.Roulettes response = ReadRoulettes(reader).FirstOrDefault();
+                    Entities.Roulettes response = ReadRows(reader).FirstOrDefault();
                     reader.Close();
                     connection.Close();
                     return response;
@@ -38,13 +39,14 @@ namespace BetPlay.Data.Roulettes
         {
             using (SqlConnection connection = new SqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                var query = "SELECT	Id, State FROM [BetPlay].[dbo].[Roulettes]";
-                SqlCommand command = new SqlCommand(query, connection);
                 try
                 {
                     connection.Open();
+                    var query = "SELECT	Id, State FROM [BetPlay].[dbo].[Roulettes]";
+                    SqlCommand command = new SqlCommand(query, connection);
+                    command.ExecuteNonQuery();
                     SqlDataReader reader = command.ExecuteReader();
-                    List<Entities.Roulettes> response = ReadRoulettes(reader);
+                    List<Entities.Roulettes> response = ReadRows(reader);
                     reader.Close();
                     connection.Close();
                     return response;
@@ -59,14 +61,15 @@ namespace BetPlay.Data.Roulettes
         {
             using (SqlConnection connection = new SqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                var query = $"INSERT INTO [BetPlay].[dbo].[Roulettes]([State]) VALUES(0);" +
-                           $"SELECT Id = CAST(SCOPE_IDENTITY() AS INT), CAST(0 AS bit)";
-                SqlCommand command = new SqlCommand(query, connection);
                 try
                 {
                     connection.Open();
+                    var query = $"INSERT INTO [BetPlay].[dbo].[Roulettes]([State]) VALUES(0);" +
+                           $"SELECT Id = CAST(SCOPE_IDENTITY() AS INT), CAST(0 AS bit)";
+                    SqlCommand command = new SqlCommand(query, connection);
+                    command.ExecuteNonQuery();
                     SqlDataReader reader = command.ExecuteReader();
-                    Entities.Roulettes response = ReadRoulettes(reader).FirstOrDefault();
+                    Entities.Roulettes response = ReadRows(reader).FirstOrDefault();
                     reader.Close();
                     connection.Close();
                     return response.Id;
@@ -83,14 +86,17 @@ namespace BetPlay.Data.Roulettes
             {
                 try
                 {
+                    connection.Open();
                     var query = $"UPDATE [BetPlay].[dbo].[Roulettes] SET [State]=1 WHERE Id = {id}";
                     SqlCommand command = new SqlCommand(query, connection);
+                    command.ExecuteNonQuery();
+                    connection.Close();
+                    return true;
                 }
                 catch (Exception ex)
                 {
                     throw ex;
                 }
-                return true;
             }
         }
         public bool CloseRoulette(int id)
@@ -99,17 +105,20 @@ namespace BetPlay.Data.Roulettes
             {
                 try
                 {
+                    connection.Open();
                     var query = $"UPDATE [BetPlay].[dbo].[Roulettes] SET [State]=0 WHERE Id = {id}";
                     SqlCommand command = new SqlCommand(query, connection);
+                    command.ExecuteNonQuery();
+                    connection.Close();
+                    return true;
                 }
                 catch (Exception ex)
                 {
                     throw ex;
                 }
-                return true;
             }
         }
-        private List<Entities.Roulettes> ReadRoulettes(SqlDataReader reader)
+        private List<Entities.Roulettes> ReadRows(SqlDataReader reader)
         {
             List<Entities.Roulettes> roulettes = new List<Entities.Roulettes>();
             while (reader.Read())

@@ -29,6 +29,18 @@ namespace BetPlay.Controllers
                 return BadRequest(ex.Message.Contains("inner") ? ex.InnerException.Message : ex.Message);
             }
         }
+        [HttpGet("{id}")]
+        public ActionResult<Entities.Roulettes> GetRoulette(int id)
+        {
+            try
+            {
+                return roulettes.GetRoulette(id);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message.Contains("inner") ? ex.InnerException.Message : ex.Message);
+            }
+        }
         [HttpPost("/CreateRoulette")]
         public ActionResult<int> CreateRoulette()
         {

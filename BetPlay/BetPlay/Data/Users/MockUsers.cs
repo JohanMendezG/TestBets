@@ -17,13 +17,14 @@ namespace BetPlay.Data.Users
         {
             using (SqlConnection connection = new SqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                var query = $"SELECT Id, Name, Money FROM [BetPlay].[dbo].[Users] WHERE Id = {id}";
-                SqlCommand command = new SqlCommand(query, connection);
                 try
                 {
                     connection.Open();
+                    var query = $"SELECT Id, Name, Money FROM [BetPlay].[dbo].[Users] WHERE Id = {id}";
+                    SqlCommand command = new SqlCommand(query, connection);
+                    command.ExecuteNonQuery();
                     SqlDataReader reader = command.ExecuteReader();
-                    Entities.Users response = ReadUsers(reader).FirstOrDefault();
+                    Entities.Users response = readRows(reader).FirstOrDefault();
                     reader.Close();
                     connection.Close();
                     return response;
@@ -34,7 +35,7 @@ namespace BetPlay.Data.Users
                 }
             }
         }
-        private List<Entities.Users> ReadUsers(SqlDataReader reader)
+        private List<Entities.Users> readRows(SqlDataReader reader)
         {
             List<Entities.Users> users = new List<Entities.Users>();
             while (reader.Read())

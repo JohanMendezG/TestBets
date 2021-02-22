@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using BetPlay.Data.Roulettes;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -19,28 +20,31 @@ namespace BetPlay.Data.Bets
             {
                 try
                 {
-                    var query = $"INSERT INTO [BetPlay].[dbo].[Bets](RouletteId,UserId,Number,Color,[Money]) " +
-                        $"VALUES({bet.RouletteId},{bet.UserId},{bet.Number},{bet.Color},{bet.Money});";
+                    connection.Open();
+                    var query = $"INSERT INTO [BetPlay].[dbo].[Bets](RouletteId,UserId,BetNumber,Number,Color,[Money]) VALUES({bet.RouletteId},{bet.UserId},'{bet.BetNumber}',{bet.Number},{bet.Color},{bet.Money})";
                     SqlCommand command = new SqlCommand(query, connection);
+                    command.ExecuteNonQuery();
+                    connection.Close();
+                    return true;
                 }
                 catch (Exception ex)
                 {
                     throw ex;
                 }
-                return true;
             }
         }
         public decimal MoneyByRoulette(int rouletteId)
         {
             using (SqlConnection connection = new SqlConnection(configuration.GetConnectionString("ConnectionString")))
             {
-                var query = $"SELECT [Money] = ISNULL(CAST(SUM([Money]) AS DECIMAL(10,2)),0) FROM [BetPlay].[dbo].[Bets] WHERE RouletteId ={rouletteId}";
-                SqlCommand command = new SqlCommand(query, connection);
                 try
                 {
                     connection.Open();
+                    var query = $"SELECT [Money] = ISNULL(CAST(SUM([Money]) AS DECIMAL(10,2)),0) FROM [BetPlay].[dbo].[Bets] WHERE RouletteId ={rouletteId}";
+                    SqlCommand command = new SqlCommand(query, connection);
+                    command.ExecuteNonQuery();
                     SqlDataReader reader = command.ExecuteReader();
-                    decimal response = (decimal)reader[0];
+                    var response = ReadRows(reader);
                     reader.Close();
                     connection.Close();
                     return response;
@@ -50,6 +54,20 @@ namespace BetPlay.Data.Bets
                     throw ex;
                 }
             }
+        }
+        public bool ValidationRouletteIsOpen(int RouletteId)
+        {
+            MockRoulettes mockRoulettes = new MockRoulettes(configuration);
+            return mockRoulettes.GetRoulette(RouletteId).State;
+        }
+        private decimal ReadRows(SqlDataReader reader)
+        {
+            decimal money = 0;
+            while (reader.Read())
+            {
+                money = (decimal)reader[0];
+            }
+            return money;
         }
     }
 }

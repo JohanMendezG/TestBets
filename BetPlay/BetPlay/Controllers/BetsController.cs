@@ -1,11 +1,6 @@
 ﻿using BetPlay.Data.Bets;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BetPlay.Controllers
 {
@@ -19,12 +14,13 @@ namespace BetPlay.Controllers
             this.bets = bets;
         }
         [HttpPost]
-        public ActionResult<string> LoadBet(Entities.Bets bet, HttpRequest request)
+        public ActionResult<string> LoadBet([FromBody] Entities.Bets bet, [FromHeader] int userId)
         {
             try
             {
                 if (ValidateBetParameters(bet))
                 {
+                    bet.UserId = userId;
                     bets.LoadBet(bet);
                     return "Apuesta almacenada";
                 }
@@ -37,24 +33,21 @@ namespace BetPlay.Controllers
         }
         private bool ValidateBetParameters(Entities.Bets bet)
         {
+            if (!RouletteIsOpen(bet.RouletteId))
+                throw new Exception("La ruleta esta cerrada");
             if (!BetMoneyMax(bet))
-                return false;
-            if (!BetByColor(bet))
-                bet.Number = null;
-            bet.Color = null;
-            if (!BetNumberOk(bet.Number ?? 0))
-                return false;
+                throw new Exception("Dinero supera el maximo permitido");
+            if (!BetNumberOk(bet.Number))
+                throw new Exception("El numero debe esta entre 0 y 36");
             return true;
+        }
+        private bool RouletteIsOpen(int RouletteId)
+        {
+            return bets.ValidationRouletteIsOpen(RouletteId);
         }
         private bool BetMoneyMax(Entities.Bets bet)
         {
             return ((bet.Money + bets.MoneyByRoulette(bet.RouletteId)) <= 10000);
-        }
-        private bool BetByColor(Entities.Bets bet)
-        {
-            if (bet.Number == null)
-                return true;
-            return false;
         }
         private bool BetNumberOk(int number)
         {

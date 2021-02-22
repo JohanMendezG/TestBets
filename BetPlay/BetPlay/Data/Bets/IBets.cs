@@ -6,5 +6,6 @@ namespace BetPlay.Data.Bets
     {
         bool LoadBet(Entities.Bets bet);
         decimal MoneyByRoulette(int rouletteId);
+        bool ValidationRouletteIsOpen(int RouletteId);
     }
 }
