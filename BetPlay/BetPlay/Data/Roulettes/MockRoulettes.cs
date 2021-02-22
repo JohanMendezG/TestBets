@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Globalization;
 using System.Linq;
 
 namespace BetPlay.Data.Roulettes
@@ -20,7 +21,7 @@ namespace BetPlay.Data.Roulettes
                 try
                 {
                     connection.Open();
-                    var query = $"SELECT Id, State FROM [BetPlay].[dbo].[Roulettes] WHERE Id = {id}";
+                    var query = $"SELECT Id,State,Apertura,Cierre FROM [BetPlay].[dbo].[Roulettes] WHERE Id = {id}";
                     SqlCommand command = new SqlCommand(query, connection);
                     command.ExecuteNonQuery();
                     SqlDataReader reader = command.ExecuteReader();
@@ -42,7 +43,7 @@ namespace BetPlay.Data.Roulettes
                 try
                 {
                     connection.Open();
-                    var query = "SELECT	Id, State FROM [BetPlay].[dbo].[Roulettes]";
+                    var query = "SELECT	Id,State,Apertura,Cierre FROM [BetPlay].[dbo].[Roulettes]";
                     SqlCommand command = new SqlCommand(query, connection);
                     command.ExecuteNonQuery();
                     SqlDataReader reader = command.ExecuteReader();
@@ -64,8 +65,8 @@ namespace BetPlay.Data.Roulettes
                 try
                 {
                     connection.Open();
-                    var query = $"INSERT INTO [BetPlay].[dbo].[Roulettes]([State]) VALUES(0);" +
-                           $"SELECT Id = CAST(SCOPE_IDENTITY() AS INT), CAST(0 AS bit)";
+                    var query = $"INSERT INTO [BetPlay].[dbo].[Roulettes]([State],Apertura,Cierre) VALUES(0,'',''); " +
+                           $"SELECT Id = CAST(SCOPE_IDENTITY() AS INT), [State] = CAST(0 AS bit), Apertura = '', Cierre = ''";
                     SqlCommand command = new SqlCommand(query, connection);
                     command.ExecuteNonQuery();
                     SqlDataReader reader = command.ExecuteReader();
@@ -87,7 +88,7 @@ namespace BetPlay.Data.Roulettes
                 try
                 {
                     connection.Open();
-                    var query = $"UPDATE [BetPlay].[dbo].[Roulettes] SET [State]=1 WHERE Id = {id}";
+                    var query = $"UPDATE [BetPlay].[dbo].[Roulettes] SET [State]=1, Apertura='{DateTime.UtcNow:O}' WHERE Id = {id}";
                     SqlCommand command = new SqlCommand(query, connection);
                     command.ExecuteNonQuery();
                     connection.Close();
@@ -106,7 +107,7 @@ namespace BetPlay.Data.Roulettes
                 try
                 {
                     connection.Open();
-                    var query = $"UPDATE [BetPlay].[dbo].[Roulettes] SET [State]=0 WHERE Id = {id}";
+                    var query = $"UPDATE [BetPlay].[dbo].[Roulettes] SET [State]=0, Cierre='{DateTime.UtcNow:O}' WHERE Id = {id}";
                     SqlCommand command = new SqlCommand(query, connection);
                     command.ExecuteNonQuery();
                     connection.Close();
@@ -126,7 +127,9 @@ namespace BetPlay.Data.Roulettes
                 roulettes.Add(new Entities.Roulettes
                 {
                     Id = (int)reader[0],
-                    State = (bool)reader[1]
+                    State = (bool)reader[1],
+                    Apertura = (string)reader[2],
+                    Cierre = (string)reader[3]
                 });
             }
             return roulettes;
